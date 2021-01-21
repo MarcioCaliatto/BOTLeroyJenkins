@@ -408,8 +408,8 @@ function speak_impl(voice_Connection, mapKey) {
       const fileSizeInBytes = stats.size;
       const duration = fileSizeInBytes / 48000 / 4;
 
-      if (duration < 1.0 || duration > 19) {
-        // 20 seconds max dur
+      if (duration < 1.0 || duration > 10) {
+        // 10 seconds max dur
         fs.unlinkSync(filename);
         return;
       }
@@ -449,17 +449,17 @@ function process_commands_query(query, mapKey, userid) {
 
   let out = null;
 
-  const regex = /^Music ([a-zA-Z]+)(.+?)?$/;
+  const regex = /^music ([a-zA-Z]+)(.+?)?$/i;
   const m = query.match(regex);
   if (m && m.length) {
     const cmd = (m[1] || "").trim();
     const args = (m[2] || "").trim();
 
-    switch (cmd) {
+    switch (cmd.toLowerCase()) {
       case "help":
         out = _CMD_HELP;
         break;
-      case "Skip":
+      case "skip":
         out = _CMD_SKIP;
         break;
       case "shuffle":
@@ -468,16 +468,16 @@ function process_commands_query(query, mapKey, userid) {
       case "genres":
         out = _CMD_GENRES;
         break;
-      case "Pause":
+      case "pause":
         out = _CMD_PAUSE;
         break;
-      case "Resume":
+      case "resume":
         out = _CMD_RESUME;
         break;
-      case "Clear":
+      case "clear":
         if (args == "list") out = _CMD_CLEAR;
         break;
-      case "List":
+      case "list":
         out = _CMD_QUEUE;
         break;
       case "hello":
@@ -494,7 +494,7 @@ function process_commands_query(query, mapKey, userid) {
             break;
         }
         break;
-      case "Play":
+      case "play":
       case "player":
         switch (args) {
           case "random":
@@ -957,7 +957,6 @@ async function transcribe_witai(file) {
   }
 
   try {
-    console.log("transcribe_witai");
     const extractSpeechIntent = util.promisify(witClient.extractSpeechIntent);
     var stream = fs.createReadStream(file);
     const contenttype =
