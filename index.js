@@ -407,11 +407,9 @@ function speak_impl(voice_Connection, mapKey) {
       const stats = fs.statSync(filename);
       const fileSizeInBytes = stats.size;
       const duration = fileSizeInBytes / 48000 / 4;
-      console.log("duration: " + duration);
 
       if (duration < 1.0 || duration > 19) {
         // 20 seconds max dur
-        console.log("TOO SHORT / TOO LONG; SKPPING");
         fs.unlinkSync(filename);
         return;
       }
@@ -950,7 +948,6 @@ async function transcribe_witai(file) {
     if (witAI_lastcallTS != null) {
       let now = Math.floor(new Date());
       while (now - witAI_lastcallTS < 1000) {
-        console.log("sleep");
         await sleep(100);
         now = Math.floor(new Date());
       }
