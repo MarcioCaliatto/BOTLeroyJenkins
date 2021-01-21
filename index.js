@@ -451,7 +451,7 @@ function process_commands_query(query, mapKey, userid) {
 
   let out = null;
 
-  const regex = /^music ([a-zA-Z]+)(.+?)?$/;
+  const regex = /^Music ([a-zA-Z]+)(.+?)?$/;
   const m = query.match(regex);
   if (m && m.length) {
     const cmd = (m[1] || "").trim();
@@ -461,7 +461,7 @@ function process_commands_query(query, mapKey, userid) {
       case "help":
         out = _CMD_HELP;
         break;
-      case "skip":
+      case "Skip":
         out = _CMD_SKIP;
         break;
       case "shuffle":
@@ -470,16 +470,16 @@ function process_commands_query(query, mapKey, userid) {
       case "genres":
         out = _CMD_GENRES;
         break;
-      case "pause":
+      case "Pause":
         out = _CMD_PAUSE;
         break;
-      case "resume":
+      case "Resume":
         out = _CMD_RESUME;
         break;
-      case "clear":
+      case "Clear":
         if (args == "list") out = _CMD_CLEAR;
         break;
-      case "list":
+      case "List":
         out = _CMD_QUEUE;
         break;
       case "hello":
@@ -496,7 +496,7 @@ function process_commands_query(query, mapKey, userid) {
             break;
         }
         break;
-      case "play":
+      case "Play":
       case "player":
         switch (args) {
           case "random":
@@ -971,7 +971,7 @@ async function transcribe_witai(file) {
     stream.destroy();
     if (output && "_text" in output && output._text.length) return output._text;
     if (output && "text" in output && output.text.length) return output.text;
-    return output.toLowerCase();
+    return output;
   } catch (e) {
     console.log("transcribe_witai 851:" + e);
     console.log(e);
