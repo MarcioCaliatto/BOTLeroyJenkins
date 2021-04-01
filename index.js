@@ -87,6 +87,7 @@ const SETTINGS_FILE = "settings.json";
 
 let DISCORD_TOK = null;
 let WITAPIKEY = null;
+let WITAPI_SERVER_KEY = null;
 let SPOTIFY_TOKEN_ID = null;
 let SPOTIFY_TOKEN_SECRET = null;
 
@@ -97,11 +98,13 @@ function loadConfig() {
     WITAPIKEY = CFG_DATA.wit_ai_token;
     SPOTIFY_TOKEN_ID = CFG_DATA.spotify_token_id;
     SPOTIFY_TOKEN_SECRET = CFG_DATA.spotify_token_secret;
+    WITAPI_SERVER_KEY = CFG_DATA.wit_ai_server_token;
   } else {
     DISCORD_TOK = process.env.DISCORD_TOK;
     WITAPIKEY = process.env.WITAPIKEY;
     SPOTIFY_TOKEN_ID = process.env.SPOTIFY_TOKEN_ID;
     SPOTIFY_TOKEN_SECRET = process.env.SPOTIFY_TOKEN_SECRET;
+    WITAPI_SERVER_KEY = process.env.wit_ai_server_token;
   }
   if (!DISCORD_TOK || !WITAPIKEY)
     throw "failed loading config #113 missing keys!";
@@ -113,7 +116,7 @@ function listWitAIApps(cb) {
   const options = {
     hostname: "api.wit.ai",
     port: 443,
-    path: "/apps?offset=0&limit=100",
+    path: "/apps?limit=100",
     method: "GET",
     headers: {
       "Content-Type": "application/json",
@@ -142,11 +145,11 @@ function updateWitAIAppLang(appID, lang, cb) {
   const options = {
     hostname: "api.wit.ai",
     port: 443,
-    path: "/apps/" + appID,
+    path: "/apps/" + 226047052463340,
     method: "PUT",
     headers: {
       "Content-Type": "application/json",
-      Authorization: "Bearer " + WITAPIKEY,
+      Authorization: "Bearer " + WITAPI_SERVER_KEY,
     },
   };
   const data = JSON.stringify({
@@ -281,25 +284,18 @@ discordClient.on("message", async (msg) => {
       msg.content.split("\n")[0].split(" ")[0].trim().toLowerCase() == _CMD_LANG
     ) {
       const lang = msg.content.replace(_CMD_LANG, "").trim().toLowerCase();
-      listWitAIApps((data) => {
-        if (!data.length) return msg.reply("no apps found! :(");
-        for (const x of data) {
-          updateWitAIAppLang(x.id, lang, (data) => {
-            if ("success" in data) msg.reply("succes!");
-            else if (
-              "error" in data &&
-              data.error !== "Access token does not match"
-            )
-              msg.reply("Error: " + data.error);
-          });
-        }
+
+      updateWitAIAppLang(226047052463340, lang, (data) => {
+        if ("success" in data) msg.reply(`Language set to ${lang}!`);
+        else if (
+          "error" in data &&
+          data.error !== "Access token does not match"
+        )
+          msg.reply("Error: " + data.error);
       });
     }
   } catch (e) {
     console.log("discordClient message: " + e);
-    msg.reply(
-      "Error#180: Something went wrong, try again or contact the developers if this keeps happening."
-    );
   }
 });
 
@@ -334,6 +330,7 @@ function getHelpString() {
   out += _CMD_GENRES + "\n";
   out += _CMD_QUEUE + "\n";
   out += _CMD_CLEAR + "\n";
+  out += _CMD_LANG + "\n";
   out += "```";
   return out;
 }
@@ -408,7 +405,7 @@ function speak_impl(voice_Connection, mapKey) {
       const fileSizeInBytes = stats.size;
       const duration = fileSizeInBytes / 48000 / 4;
 
-      if (duration < 1.0 || duration > 10) {
+      if (duration < 3.0 || duration > 10) {
         // 10 seconds max dur
         fs.unlinkSync(filename);
         return;
