@@ -405,7 +405,7 @@ function speak_impl(voice_Connection, mapKey) {
       const fileSizeInBytes = stats.size;
       const duration = fileSizeInBytes / 48000 / 4;
 
-      if (duration < 3.0 || duration > 10) {
+      if (duration < 1.0 || duration > 10) {
         // 10 seconds max dur
         fs.unlinkSync(filename);
         return;
