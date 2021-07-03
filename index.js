@@ -378,6 +378,7 @@ function speak_impl(voice_Connection, mapKey) {
     }
     console.log(`I'm listening to ${user.username}`);
 
+    if(username === 'Dhesh') return null;
     const filename =
       "./temp/audio_" +
       mapKey +
@@ -560,6 +561,7 @@ async function music_message(message, mapKey) {
         if (isYoutube(qry) && isYoutubePlaylist(qry)) {
           try {
             const arr = await youtube_tracks_from_playlist(qry);
+            console.log(arr);
             for (let item of arr) addToQueue(item, mapKey);
             message.react(EMOJI_GREEN_CIRCLE);
           } catch (e) {
@@ -1050,7 +1052,9 @@ function isYoutubePlaylist(str) {
 }
 
 async function youtube_tracks_from_playlist(url, isretry = false) {
+  try {
   const data = await ytlist(url, "url");
+
   if (
     data &&
     "data" in data &&
@@ -1068,6 +1072,11 @@ async function youtube_tracks_from_playlist(url, isretry = false) {
     }
   }
 }
+catch(err){
+  console.log(err);
+}
+}
+
 
 async function getYoutubeVideoData(str, isretry = false) {
   try {
