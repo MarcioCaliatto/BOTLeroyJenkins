@@ -378,7 +378,6 @@ function speak_impl(voice_Connection, mapKey) {
     }
     console.log(`I'm listening to ${user.username}`);
 
-    if(username === 'Dhesh') return null;
     const filename =
       "./temp/audio_" +
       mapKey +
