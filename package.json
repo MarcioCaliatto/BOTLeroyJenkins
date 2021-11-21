@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "engines": {
-    "node": "14.x"
+    "node": "15.x"
   },
   "dependencies": {
     "@discordjs/opus": "^0.4.0",
