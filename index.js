@@ -99,11 +99,11 @@ function loadConfig() {
     SPOTIFY_TOKEN_SECRET = CFG_DATA.spotify_token_secret;
     WITAPI_SERVER_KEY = CFG_DATA.wit_ai_server_token;
   } else {
-    DISCORD_TOK = "ODAwMDQ4MDY2OTU3OTM0NjEy.YAMc0w.nRh5Q74HHWKiX9vpI8qEMUtm2jc";
-    WITAPIKEY = "DDLVKWL72DWZPBJA24WR3O7HVT7YPS5F";
-    SPOTIFY_TOKEN_ID = "7992f3745d284faa8ca5ea17bd0334f6";
-    SPOTIFY_TOKEN_SECRET = "e31f8fe6ec064bf299388b8dc9891bff";
-    WITAPI_SERVER_KEY = process.env.wit_ai_server_token;
+    DISCORD_TOK = process.env.DISCORD_TOK;
+    WITAPIKEY = process.env.SPOTIFY_TOKEN_SECRET;
+    SPOTIFY_TOKEN_ID = process.env.SPOTIFY_TOKEN_ID;
+    SPOTIFY_TOKEN_SECRET = process.env.SPOTIFY_TOKEN_SECRET;
+    WITAPI_SERVER_KEY = process.env.WITAPI_SERVER_KEY;
   }
   if (!DISCORD_TOK || !WITAPIKEY)
     throw "failed loading config #113 missing keys!";
