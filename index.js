@@ -15,7 +15,6 @@ console.log = function () {
 const fs = require("fs");
 const util = require("util");
 const path = require("path");
-const request = require("request");
 
 //////////////////////////////////////////
 ///////////////// VARIA //////////////////
@@ -100,10 +99,10 @@ function loadConfig() {
     SPOTIFY_TOKEN_SECRET = CFG_DATA.spotify_token_secret;
     WITAPI_SERVER_KEY = CFG_DATA.wit_ai_server_token;
   } else {
-    DISCORD_TOK = process.env.DISCORD_TOK;
-    WITAPIKEY = process.env.WITAPIKEY;
-    SPOTIFY_TOKEN_ID = process.env.SPOTIFY_TOKEN_ID;
-    SPOTIFY_TOKEN_SECRET = process.env.SPOTIFY_TOKEN_SECRET;
+    DISCORD_TOK = "ODAwMDQ4MDY2OTU3OTM0NjEy.YAMc0w.nRh5Q74HHWKiX9vpI8qEMUtm2jc";
+    WITAPIKEY = "DDLVKWL72DWZPBJA24WR3O7HVT7YPS5F";
+    SPOTIFY_TOKEN_ID = "7992f3745d284faa8ca5ea17bd0334f6";
+    SPOTIFY_TOKEN_SECRET = "e31f8fe6ec064bf299388b8dc9891bff";
     WITAPI_SERVER_KEY = process.env.wit_ai_server_token;
   }
   if (!DISCORD_TOK || !WITAPIKEY)
@@ -446,9 +445,12 @@ function process_commands_query(query, mapKey, userid) {
 
   let out = null;
 
-  const regex = /^music ([a-zA-Z]+)(.+?)?$/i;
-  const m = query.match(regex);
-  if (m && m.length) {
+  const regexPattern = /^music ([a-zA-Z]+)(.+?)?$/i;
+  const sanitizedString = query.match(regexPattern);
+
+  console.log(sanitizedString);
+
+  if (sanitizedString?.length) {
     const cmd = (m[1] || "").trim();
     const args = (m[2] || "").trim();
 
@@ -509,6 +511,7 @@ function process_commands_query(query, mapKey, userid) {
             }
             if (out == null) {
               out = _CMD_PLAY + " " + args;
+              console.log(args, out);
             }
         }
         break;
@@ -827,7 +830,7 @@ async function queueTryPlayNext(mapKey, cbok, cberr) {
       return;
     }
 
-    if (val.musicQueue.length == 0) return;
+    if (val.musicQueue?.length == 0) return;
     if (val.currentPlayingTitle) return;
 
     const qry = val.musicQueue.shift();
@@ -961,14 +964,12 @@ async function transcribe_witai(file) {
       "audio/raw;encoding=signed-integer;bits=16;rate=48k;endian=little";
     const output = await extractSpeechIntent(WITAPIKEY, stream, contenttype);
     witAI_lastcallTS = Math.floor(new Date());
-    console.log(output);
+    console.log("output", output);
     stream.destroy();
-    if (output && "_text" in output && output._text.length) return output._text;
-    if (output && "text" in output && output.text.length) return output.text;
+    if (output.text?.length > 0) return output.text;
     return output;
   } catch (e) {
     console.log("transcribe_witai 851:" + e);
-    console.log(e);
   }
 }
 
@@ -1002,7 +1003,7 @@ async function transcribe_gspeech(file) {
     const transcription = response.results
       .map((result) => result.alternatives[0].transcript)
       .join("\n");
-    console.log(`gspeech: ${transcription}`);
+    // console.log(`gspeech: ${transcription}`);
     return transcription;
   } catch (e) {
     console.log("transcribe_gspeech 368:" + e);
@@ -1011,8 +1012,6 @@ async function transcribe_gspeech(file) {
 
 //////////////////////////////////////////
 //////////////////////////////////////////
-//////////////////////////////////////////
-
 //////////////////////////////////////////
 //////////////// YOUTUBE /////////////////
 //////////////////////////////////////////
@@ -1027,15 +1026,15 @@ async function searchYoutubeVideo(query) {
   try {
     const videos = r.videos;
     if (!videos.length) {
-      console.log(query);
+      // console.log(query);
       throw new Error("videos empty array");
     }
     const playlists = r.playlists || r.lists;
     const channels = r.channels || r.accounts;
     return { id: videos[0].videoId, title: videos[0].title };
   } catch (e) {
-    console.log(r);
-    console.log("searchYoutubeVideo: " + e);
+    // console.log(r);
+    // console.log("searchYoutubeVideo: " + e);
     throw e;
   }
 }
@@ -1052,30 +1051,28 @@ function isYoutubePlaylist(str) {
 
 async function youtube_tracks_from_playlist(url, isretry = false) {
   try {
-  const data = await ytlist(url, "url");
+    const data = await ytlist(url, "url");
 
-  if (
-    data &&
-    "data" in data &&
-    "playlist" in data.data &&
-    data.data.playlist &&
-    data.data.playlist.length
-  ) {
-    return data.data.playlist;
-  } else {
-    if (!isretry) {
-      console.log("retrying yt playlist processing");
-      return await youtube_tracks_from_playlist(url, true);
+    if (
+      data &&
+      "data" in data &&
+      "playlist" in data.data &&
+      data.data.playlist &&
+      data.data.playlist.length
+    ) {
+      return data.data.playlist;
     } else {
-      return null;
+      if (!isretry) {
+        // console.log("retrying yt playlist processing");
+        return await youtube_tracks_from_playlist(url, true);
+      } else {
+        return null;
+      }
     }
+  } catch (err) {
+    // console.log(err);
   }
 }
-catch(err){
-  console.log(err);
-}
-}
-
 
 async function getYoutubeVideoData(str, isretry = false) {
   try {
